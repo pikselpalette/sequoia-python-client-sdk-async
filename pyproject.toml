@@ -1,0 +1,52 @@
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry]
+name = "sequoia-client-sdk-async"
+version = "0.1.0"
+description = ""
+authors = ["José Antonio Perdiguero López <perdy@perdy.io>"]
+license = "GPL-3.0+"
+readme = "README.md"
+repository = "https://github.com/pikselpalette/sequoia-python-client-sdk-async"
+keywords = ["piksel", "sequoia", "client", "sdk", "asyncio"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+]
+include = []
+exclude = []
+
+[tool.poetry.dependencies]
+python = "^3.6"
+httpx = "^0.11.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.0"
+pytest-xdist = "^1.22"
+pytest-cov = "^2.5"
+clinner = "^1.10"
+ipython = "^7.0"
+ipdb = "^0.11"
+isort = "^4.3"
+flake8 = "^3.7"
+pytest-asyncio = "^0.10"
+mkdocs = "^1.0"
+mkdocs-material = "^4.0"
+black = {version = "^19.3b0",allow-prereleases = true}
+
+[tool.black]
+line-length = 120
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.tox
+  | build
+  | dist
+)/
+'''

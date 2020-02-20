@@ -1,0 +1,43 @@
+# Project information
+site_name: Sequoia Python Client SDK Async
+site_description: "Python asyncio based SDK for using Piksel Palette services"
+site_author: "Piksel"
+site_url: ""
+
+# Copyright
+copyright: "GNU General Public License v3.0; 2020 - Present; Piksel"
+
+# Repository
+repo_name: "pikselpalette/sequoia-python-client-sdk-async"
+repo_url: "https://github.com/pikselpalette/sequoia"
+edit_uri: ""
+
+nav:
+  - Home: index.md
+
+
+# Theme configuration
+theme:
+  name: material
+  palette:
+    primary: "blue"
+    accent: "yellow"
+  font:
+    text: "Fira Sans"
+    code: "Fira Mono"
+
+# Customization
+extra:
+  social:
+    - type: "github"
+      link: "https://github.com/pikselpalette"
+
+# Extensions
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - meta
+  - footnotes
+  - codehilite:
+      guess_lang: false
