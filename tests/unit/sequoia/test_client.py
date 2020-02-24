@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, Mock, patch
 import httpx
 import pytest
 
-from sequoia.client import SequoiaClient
+from sequoia.client import Client
 from sequoia.exceptions import (
     ClientNotInitialized,
     DiscoveryResourcesError,
@@ -18,13 +18,13 @@ from sequoia.types import Resource, Service, ServicesRegistry
 class TestCaseSequoiaClient:
     @pytest.fixture
     def sequoia_client(self):
-        return SequoiaClient(registry_url="", client_id="", client_secret="")
+        return Client(registry_url="", client_id="", client_secret="")
 
     @pytest.mark.type_unit
     @pytest.mark.execution_fast
     @pytest.mark.priority_high
     def test_init(self):
-        client = SequoiaClient(registry_url="https://registry.sequoia.piksel.com", client_id="foo", client_secret="bar")
+        client = Client(registry_url="https://registry.sequoia.piksel.com", client_id="foo", client_secret="bar")
         assert client._client_id == "foo"
         assert client._client_secret == "bar"
         assert client._token is None
@@ -247,7 +247,7 @@ class TestCaseSequoiaClient:
         with patch.object(httpx.AsyncClient, "request", new_callable=AsyncMock, side_effect=responses), pytest.raises(
             DiscoveryServicesError
         ):
-            sequoia_client = SequoiaClient(registry_url="", client_id="", client_secret="")
+            sequoia_client = Client(registry_url="", client_id="", client_secret="")
             await sequoia_client.update_services()
 
     @pytest.mark.asyncio
@@ -264,7 +264,7 @@ class TestCaseSequoiaClient:
         with patch.object(httpx.AsyncClient, "request", new_callable=AsyncMock, side_effect=responses), pytest.raises(
             DiscoveryServicesError
         ):
-            sequoia_client = SequoiaClient(registry_url="", client_id="", client_secret="")
+            sequoia_client = Client(registry_url="", client_id="", client_secret="")
             await sequoia_client.update_services()
 
     @pytest.mark.asyncio
@@ -283,7 +283,7 @@ class TestCaseSequoiaClient:
         with patch.object(httpx.AsyncClient, "request", new_callable=AsyncMock, side_effect=responses), pytest.raises(
             DiscoveryResourcesError
         ):
-            sequoia_client = SequoiaClient(registry_url="", client_id="", client_secret="")
+            sequoia_client = Client(registry_url="", client_id="", client_secret="")
             await sequoia_client.update_services()
             await sequoia_client.resources("metadata")
 
@@ -303,7 +303,7 @@ class TestCaseSequoiaClient:
         with patch.object(httpx.AsyncClient, "request", new_callable=AsyncMock, side_effect=responses), pytest.raises(
             DiscoveryResourcesError
         ):
-            sequoia_client = SequoiaClient(registry_url="", client_id="", client_secret="")
+            sequoia_client = Client(registry_url="", client_id="", client_secret="")
             await sequoia_client.update_services()
             await sequoia_client.resources("metadata")
 

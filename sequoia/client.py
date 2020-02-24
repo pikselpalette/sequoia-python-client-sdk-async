@@ -10,10 +10,10 @@ from sequoia.types import Resource, Service, ServicesRegistry
 
 logger = logging.getLogger(__name__)
 
-__all__ = ["SequoiaClient"]
+__all__ = ["Client"]
 
 
-class SequoiaClient:
+class Client:
     """
     Client to interact with Sequoia services.
     """

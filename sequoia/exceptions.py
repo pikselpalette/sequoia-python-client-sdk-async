@@ -1,3 +1,15 @@
+__all__ = [
+    "ServiceNotFound",
+    "ResourceNotFound",
+    "RequestAlreadyBuilt",
+    "RequestNotBuilt",
+    "DiscoveryServicesError",
+    "DiscoveryResourcesError",
+    "UpdateTokenError",
+    "ClientNotInitialized",
+]
+
+
 class ServiceNotFound(LookupError):
     """
     Exception class that represents a service that cannot be found.

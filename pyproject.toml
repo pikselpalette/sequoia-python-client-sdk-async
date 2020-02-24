@@ -18,8 +18,9 @@ classifiers = [
     "Topic :: Software Development",
     "Topic :: Software Development :: Libraries",
 ]
-include = []
-exclude = []
+packages = [
+    { include = "sequoia" }
+]
 
 [tool.poetry.dependencies]
 python = "^3.6"
