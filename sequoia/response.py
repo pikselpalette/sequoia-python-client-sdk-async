@@ -3,6 +3,7 @@ import logging
 import typing
 
 import httpx
+
 from sequoia.codecs import JSONDecoder
 
 logger = logging.getLogger(__name__)

@@ -4,12 +4,7 @@ import typing
 
 import httpx
 
-from sequoia.exceptions import (
-    DiscoveryResourcesError,
-    DiscoveryServicesError,
-    ResourceNotFound,
-    ServiceNotFound,
-)
+from sequoia.exceptions import DiscoveryResourcesError, DiscoveryServicesError, ResourceNotFound, ServiceNotFound
 
 logger = logging.getLogger(__name__)
 

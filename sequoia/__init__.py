@@ -1,4 +1,4 @@
-from sequoia.client import Client
-from sequoia.request import Request
-from sequoia.response import Response
-from sequoia.exceptions import *
+from sequoia.client import Client  # noqa
+from sequoia.exceptions import *  # noqa
+from sequoia.request import Request  # noqa
+from sequoia.response import Response  # noqa

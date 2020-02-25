@@ -4,12 +4,7 @@ import httpx
 import pytest
 
 from sequoia.client import Client
-from sequoia.exceptions import (
-    ClientNotInitialized,
-    DiscoveryResourcesError,
-    DiscoveryServicesError,
-    UpdateTokenError,
-)
+from sequoia.exceptions import ClientNotInitialized, DiscoveryResourcesError, DiscoveryServicesError, UpdateTokenError
 from sequoia.request import RequestBuilder
 from sequoia.response import Response
 from sequoia.types import Resource, Service, ServicesRegistry
