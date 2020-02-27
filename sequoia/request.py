@@ -39,8 +39,12 @@ class Request(httpx.Request):
             "method": self.method,
             "url": str(self.url),
             "headers": dict(self.headers),
-            "content": repr(self.content.decode("utf-8")),
         }
+        try:
+            params["content"] = repr(self.content.decode("utf-8"))
+        except httpx.exceptions.RequestNotRead:
+            pass
+
         formatted_params = ", ".join([f"{k}={v}" for k, v in params.items()])
         return f"<{self.__class__.__name__}({formatted_params})>"
 
