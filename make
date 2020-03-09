@@ -52,7 +52,7 @@ def poetry(*args) -> typing.List[str]:
 
 @command(command_type=Type.SHELL, parser_opts={"help": "Install requirements"})
 def install(*args, **kwargs):
-    return [poetry("install", "-E", "full", *args)]
+    return [poetry("install", *args)]
 
 
 @command(command_type=Type.PYTHON, parser_opts={"help": "Clean directory"})
@@ -83,7 +83,7 @@ def isort(*args, **kwargs):
 
 @command(command_type=Type.SHELL, parser_opts={"help": "Code lint using multiple tools"})
 def lint(*args, **kwargs):
-    return black() + flake8() + isort()
+    return black(".") + flake8() + isort("--check-only")
 
 
 @command(command_type=Type.SHELL, parser_opts={"help": "Run tests"})

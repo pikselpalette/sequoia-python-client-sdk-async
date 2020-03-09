@@ -2,6 +2,7 @@ import datetime
 import json
 
 import pytest
+
 from sequoia.codecs import JSONDecoder, JSONEncoder
 
 

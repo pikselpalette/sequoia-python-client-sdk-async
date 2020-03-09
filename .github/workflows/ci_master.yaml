@@ -1,0 +1,52 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "v[0-9]*.[0-9]*.[0-9]*"
+
+jobs:
+  test:
+    name: Test (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [3.8]
+    container:
+      image: python:${{ matrix.python }}
+    steps:
+      - uses: actions/checkout@master
+      - id: install
+        name: Install requirements
+        run: |
+          pip install clinner pip poetry --upgrade
+          python make install
+      - id: black
+        name: Code format checking
+        run: python make black --check .
+      - id: isort
+        name: Imports order checking
+        run: python make isort --check-only
+      - id: flake8
+        name: Code lint
+        run: python make flake8
+      - id: tests
+        name: Tests
+        run: python make test
+  release:
+    needs: test
+    name: Release a new version
+    runs-on: ubuntu-latest
+    container:
+      image: perdy/github-actions-builder:latest
+    steps:
+      - uses: actions/checkout@master
+        if: github.event_name == 'push' && github.ref != 'refs/heads/master'
+      - id: publish
+        name: Publish version
+        if: github.event_name == 'push' && github.ref != 'refs/heads/master'
+        run: python make publish --build
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}

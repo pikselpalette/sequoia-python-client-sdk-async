@@ -4,12 +4,8 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import httpx
 import pytest
-from sequoia.exceptions import (
-    RequestAlreadyBuilt,
-    RequestNotBuilt,
-    ResourceNotFound,
-    ServiceNotFound,
-)
+
+from sequoia.exceptions import RequestAlreadyBuilt, RequestNotBuilt, ResourceNotFound, ServiceNotFound
 from sequoia.request import RequestBuilder
 from sequoia.response import Response
 from sequoia.types import Resource, ResourcesRegistry, Service, ServicesRegistry
@@ -212,7 +208,9 @@ class TestCaseRequestBuilder:
     async def test_list(self, request_builder):
         # Prepare
         responses = [
-            httpx.Response(request=Mock(), status_code=200, content=b'{"meta": {"continue": "/bar?page=2"}, "bar": [{"id": 1}]}'),
+            httpx.Response(
+                request=Mock(), status_code=200, content=b'{"meta": {"continue": "/bar?page=2"}, "bar": [{"id": 1}]}'
+            ),
             httpx.Response(request=Mock(), status_code=200, content=b'{"meta": {}, "bar": [{"id": 2}]}'),
         ]
         request_builder._httpx_client.send = AsyncMock(side_effect=responses)
