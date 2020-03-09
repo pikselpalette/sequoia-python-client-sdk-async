@@ -1,4 +1,3 @@
-import copy
 import logging
 import typing
 
@@ -17,11 +16,11 @@ class Response(httpx.Response):
     """
 
     def __init__(self, response: httpx.Response):
-        self.__dict__.update(copy.deepcopy(response.__dict__))
+        self.__dict__.update(response.__dict__.copy())
 
     def json(self, **kwargs: typing.Any) -> typing.Union[dict, list]:
         if not hasattr(self, "_json"):
-            self._json = super().json(cls=JSONDecoder)
+            self._json = super().json(cls=JSONDecoder) if self.text != "" else self.text
 
         return self._json
 
