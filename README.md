@@ -10,11 +10,13 @@ development of different pieces on top of this ecosystem.
 
 Among other characteristics it provides the following:
 
-* **Authentication** flow integrated and transparent.
 * **Async** requests based on `asyncio` engine providing a high throughput.
-* **Discovery** for Sequoia services, API resources and methods.
 * **Lazy loading** to avoid use and discover not needed elements.
+* **Authentication** flow integrated and transparent.
+* **Discovery** for Sequoia services, API resources and methods.
 * **Pagination** automatically handled using continue-based pagination. It's completely transparent to client users.
+* **Schema** validation, including serialization from Sequoia API types into Python's native types and the opposite.
+* **Syntactic sugar** to allow its usage be pythonic.
 
 ## Requirements
 
@@ -33,13 +35,13 @@ The client understand three kind of elements:
 * `Resource`: An specific resource of previous service.
 * `Method`: Operation that will be performed (`create`, `retrieve`, `update`, `delete`, `list`).
 
-The syntax to interact with the client is the following for a resource (`create`, `retrieve`, `update`, `delete`):
+The syntax to interact with the client is the following for an specific **resource** (`create`, `retrieve`, `update`, `delete`):
 
 ```python
 await client.service.resource.method(params={}, headers={})
 ```
 
-And the next one for interacting with collections (`list`):
+And the next one for interacting with **collections** (`list`):
 
 ```python
 async for item in client.service.resource.method(params={}, headers={}):
