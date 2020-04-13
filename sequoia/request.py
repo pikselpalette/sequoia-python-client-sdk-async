@@ -7,6 +7,7 @@ from urllib.parse import parse_qsl, urljoin, urlparse, urlunparse
 
 import httpx
 import httpx.content_streams
+import backoff
 
 from sequoia.codecs import JSONEncoder
 from sequoia.exceptions import RequestAlreadyBuilt, RequestNotBuilt
@@ -281,7 +282,7 @@ class RequestBuilder:
         try:
             request = Request(method=self.method, url=self.url, **kwargs)
             logger.debug("Request: %r", request)
-            response = await self._httpx_client.send(request=request)
+            response = await self._request_with_retry(request)
             response.raise_for_status()
             response = Response(response=response)
             response.json()  # Parse immediately to check there is no error and cache json
@@ -299,6 +300,15 @@ class RequestBuilder:
             logger.debug("Response: %r", response)
 
         return response
+
+    @backoff.on_exception(
+        backoff.expo,
+        httpx.exceptions.TimeoutException,
+        max_tries=10,
+        logger=logger,
+    )
+    async def _request_with_retry(self, request: Request) -> Response:
+        return await self._httpx_client.send(request=request)
 
     async def _build_url(self, pk: str = None) -> str:
         """
