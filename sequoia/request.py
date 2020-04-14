@@ -5,9 +5,9 @@ from functools import wraps
 from json import JSONDecodeError
 from urllib.parse import parse_qsl, urljoin, urlparse, urlunparse
 
+import backoff
 import httpx
 import httpx.content_streams
-import backoff
 
 from sequoia.codecs import JSONEncoder
 from sequoia.exceptions import RequestAlreadyBuilt, RequestNotBuilt
@@ -302,10 +302,7 @@ class RequestBuilder:
         return response
 
     @backoff.on_exception(
-        backoff.expo,
-        httpx.exceptions.TimeoutException,
-        max_tries=10,
-        logger=logger,
+        backoff.expo, httpx.exceptions.TimeoutException, max_tries=10, logger=logger,
     )
     async def _request_with_retry(self, request: Request) -> Response:
         return await self._httpx_client.send(request=request)
