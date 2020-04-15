@@ -84,6 +84,7 @@ class RequestBuilder:
         self,
         httpx_client: httpx.AsyncClient,
         available_services: ServicesRegistry,
+        max_retries: int,
         service: typing.Optional[str] = None,
         resource: typing.Optional[str] = None,
         owner: typing.Optional[str] = None,
@@ -105,6 +106,7 @@ class RequestBuilder:
         self._available_services = available_services
         self._service_name = service
         self._resource_name = resource
+        self._max_retries = max_retries
 
     @property
     @built(service=True)
@@ -140,6 +142,7 @@ class RequestBuilder:
             resource=self._resource_name,
             owner=self._owner,
             token=self._token,
+            max_retries=self._max_retries,
         )
 
     def _build_resource(self, resource: str) -> "RequestBuilder":
@@ -157,6 +160,7 @@ class RequestBuilder:
             resource=resource,
             owner=self._owner,
             token=self._token,
+            max_retries=self._max_retries,
         )
 
     async def custom(self, path: str, method: str = "GET", **kwargs) -> typing.Dict[typing.Any, typing.Any]:
@@ -301,10 +305,13 @@ class RequestBuilder:
 
         return response
 
-    @backoff.on_exception(
-        backoff.expo, httpx.exceptions.TimeoutException, max_tries=10, logger=logger,
-    )
     async def _request_with_retry(self, request: Request) -> Response:
+        send_with_retry = backoff.on_exception(
+            backoff.expo, httpx.exceptions.HTTPError, max_tries=self._max_retries, logger=logger,
+        )(self._request_with_retry_aux)
+        return await send_with_retry(request)
+
+    async def _request_with_retry_aux(self, request: Request) -> Response:
         return await self._httpx_client.send(request=request)
 
     async def _build_url(self, pk: str = None) -> str:

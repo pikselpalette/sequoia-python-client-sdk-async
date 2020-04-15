@@ -36,7 +36,9 @@ def services_registry(service):
 class TestCaseBuiltDecorator:
     @pytest.fixture(scope="class")
     def request_builder(self, services_registry):
-        return RequestBuilder(httpx_client=AsyncMock(spec=httpx.AsyncClient), available_services=services_registry)
+        return RequestBuilder(
+            httpx_client=AsyncMock(spec=httpx.AsyncClient), available_services=services_registry, max_retries=1
+        )
 
     @pytest.mark.type_unit
     @pytest.mark.execution_fast
@@ -64,7 +66,7 @@ class TestCaseRequestBuilder:
 
     @pytest.fixture()
     def request_builder(self, httpx_client, services_registry):
-        return RequestBuilder(httpx_client=httpx_client, available_services=services_registry)
+        return RequestBuilder(httpx_client=httpx_client, available_services=services_registry, max_retries=1)
 
     @pytest.mark.type_unit
     @pytest.mark.execution_fast
@@ -79,6 +81,7 @@ class TestCaseRequestBuilder:
         assert builder._token is None
         assert builder._service == Service(name="foo", url="https://foo")
         assert await builder._resource == Resource(name="bar", path="/bar")
+        assert builder._max_retries == 1
 
     @pytest.mark.type_unit
     @pytest.mark.execution_fast
@@ -356,7 +359,6 @@ class TestCaseRequestBuilder:
     @pytest.mark.asyncio
     async def test_request_http_error(self, request_builder):
         # Set up mocks
-
         request_mock = Mock(spec=httpx.Request)
         response_mock = Mock(spec=httpx.Response)
         response_mock.status_code = 400
@@ -380,4 +382,53 @@ class TestCaseRequestBuilder:
 
         # Run
         with patch.object(Response, "json", side_effect=JSONDecodeError("", "", 0)), pytest.raises(JSONDecodeError):
+            await request_builder.foo.bar.retrieve(pk=1)
+
+    @pytest.mark.type_unit
+    @pytest.mark.execution_fast
+    @pytest.mark.priority_high
+    @pytest.mark.asyncio
+    async def test_request_with_retry(self, httpx_client, services_registry):
+        # Prepare
+        request_builder = RequestBuilder(httpx_client=httpx_client, available_services=services_registry, max_retries=2)
+        request_builder._httpx_client.send = AsyncMock(
+            side_effect=[
+                httpx.exceptions.TimeoutException(),
+                httpx.Response(request=Mock(), status_code=200, content=b'{"foo": "2000-01-01T00:00:00.000Z"}'),
+            ]
+        )
+
+        # Run
+        response = await request_builder._request(method="GET", url="https://foo/bar", params={"foo": "bar"})
+
+        # Asserts
+        expected_method = "GET"
+        expected_url = "https://foo/bar?foo=bar"
+        assert request_builder._httpx_client.send.call_count == 2
+        request1 = request_builder._httpx_client.send.call_args_list[0][1]["request"]
+        await request1.aread()
+        assert request1.method == expected_method
+        assert request1.url == expected_url
+        request2 = request_builder._httpx_client.send.call_args_list[1][1]["request"]
+        await request2.aread()
+        assert request2.method == expected_method
+        assert request2.url == expected_url
+        assert response.json() == {"foo": datetime.datetime(2000, 1, 1, tzinfo=datetime.timezone.utc)}
+
+    @pytest.mark.type_unit
+    @pytest.mark.execution_fast
+    @pytest.mark.priority_high
+    @pytest.mark.asyncio
+    async def test_request_http_error_with_retry(self, request_builder):
+        # Set up mocks
+        request_mock = Mock(spec=httpx.Request)
+        response_mock = Mock(spec=httpx.Response)
+        response_mock.status_code = 400
+        response_mock.content = b""
+        request_builder._httpx_client.send = AsyncMock(
+            side_effect=httpx.exceptions.HTTPError(request=request_mock, response=response_mock)
+        )
+
+        # Run
+        with pytest.raises(httpx.exceptions.HTTPError):
             await request_builder.foo.bar.retrieve(pk=1)
