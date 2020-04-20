@@ -25,6 +25,7 @@ class TestCaseSequoiaClient:
         assert client._token is None
         assert client._owner is None
         assert len(client._services) == 0
+        assert client._max_retries == Client.DEFAULT_MAX_RETRIES
 
     @pytest.mark.asyncio
     @pytest.mark.type_unit
@@ -366,6 +367,7 @@ class TestCaseSequoiaClient:
                     owner=client._owner,
                     token=client._token,
                     available_services=client._services,
+                    max_retries=client._max_retries,
                 )
 
     @pytest.mark.type_unit

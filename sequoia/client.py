@@ -19,6 +19,7 @@ class Client:
     """
 
     request_builder = RequestBuilder
+    DEFAULT_MAX_RETRIES = 3
 
     def __init__(
         self,
@@ -27,6 +28,7 @@ class Client:
         registry_url: str,
         owner: typing.Optional[str] = None,
         httpx_client: typing.Optional[httpx.AsyncClient] = None,
+        max_retries: int = DEFAULT_MAX_RETRIES,
     ) -> None:
         """
         Client to interact with Sequoia services.
@@ -36,14 +38,16 @@ class Client:
         :param registry_url: URL for Registry service.
         :param owner: Owner.
         :param httpx_client: Httpx client, a mechanism to reuse an already created client.
+        :param max_retries: Max num of attempts to connect to a sequoia service after receiving an error
         """
         self._registry_url = registry_url
         self._client_id = client_id
         self._client_secret = client_secret
         self._httpx_client = httpx_client if httpx_client is not None else httpx.AsyncClient(verify=False)
-        self._token: typing.Optional[str] = None
         self._owner = owner
+        self._token: typing.Optional[str] = None
         self._services: ServicesRegistry = ServicesRegistry()
+        self._max_retries = max_retries
 
     async def set_owner(self, owner: str):
         """
@@ -87,7 +91,11 @@ class Client:
             raise ClientNotInitialized
 
         return self.request_builder(
-            httpx_client=self._httpx_client, available_services=self._services, owner=self._owner, token=self._token
+            httpx_client=self._httpx_client,
+            available_services=self._services,
+            owner=self._owner,
+            token=self._token,
+            max_retries=self._max_retries,
         )
 
     async def update_services(self):
